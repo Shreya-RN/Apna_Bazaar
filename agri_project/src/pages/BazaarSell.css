@@ -1,0 +1,94 @@
+.bazaar-sell-page {
+  min-height: 100vh;
+  padding: 28px 20px;
+  background:
+    radial-gradient(circle at top right, rgba(255,255,255,0.4), transparent 26%),
+    linear-gradient(180deg, #f8f4ec 0%, #eee6da 100%);
+}
+
+.bazaar-sell-shell {
+  width: min(1200px, 100%);
+  min-height: calc(100vh - 56px);
+  margin: 0 auto;
+  padding: 0 0 30px;
+  opacity: 0;
+  transform: translateY(18px) scale(0.992);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+
+.bazaar-sell-shell.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.bazaar-sell-title-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 26px;
+}
+
+.bazaar-sell-title {
+  min-width: 260px;
+  text-align: center;
+  padding: 14px 28px;
+  border-radius: 18px;
+  color: #6b5735;
+  font-size: 1.3rem;
+  font-weight: 700;
+  background: rgba(255,255,255,0.42);
+  border: 1px solid rgba(255,255,255,0.55);
+  box-shadow: 0 10px 26px rgba(80, 70, 50, 0.07);
+  backdrop-filter: blur(16px);
+}
+
+.bazaar-sell-board {
+  margin: 28px 26px 0;
+  min-height: 580px;
+  padding: 28px 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.bazaar-sell-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  position: relative;
+  z-index: 2;
+}
+
+.market-status-row {
+  margin-top: 18px;
+  display: flex;
+  justify-content: flex-start;
+  position: relative;
+  z-index: 2;
+}
+
+.bazaar-sell-actions {
+  margin-top: 24px;
+  display: flex;
+  gap: 14px;
+  justify-content: flex-end;
+  position: relative;
+  z-index: 2;
+}
+
+@media (max-width: 768px) {
+  .bazaar-sell-page {
+    padding: 12px 10px;
+  }
+
+  .bazaar-sell-board {
+    margin: 20px 12px 0;
+    padding: 20px 16px;
+  }
+
+  .bazaar-sell-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bazaar-sell-actions {
+    flex-direction: column;
+  }
+}

@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import TopBar from "../components/TopBar";
+import VoiceButton from "../components/VoiceButton";
 import { useLanguage } from "../context/LanguageContext";
+import { marketPrices } from "../data/marketPrices";
 import "../App.css";
 import heroImg from "../assets/farmer.jpg";
-import VoiceButton from "../components/VoiceButton";
 
 function lerp(start, end, factor) {
   return start + (end - start) * factor;
@@ -17,12 +18,6 @@ function clamp(value, min, max) {
 export default function Home() {
   const navigate = useNavigate();
   const { language, languages, setLanguage, t } = useLanguage();
-    const homeReadText = `
-    ${t.appTitle}.
-    ${t.equipment}. ${t.equipmentSubtitle}.
-    ${t.personalBazaar}. ${t.bazaarSubtitle}.
-    ${t.recruitment}. ${t.recruitmentSubtitle}.
-  `;
 
   const cards = [
     {
@@ -30,23 +25,46 @@ export default function Home() {
       subtitle: t.equipmentSubtitle,
       image: "/icons/tractor.png",
       path: "/equipment",
+      stat: "120+ listings",
     },
     {
       title: t.personalBazaar,
       subtitle: t.bazaarSubtitle,
       image: "/icons/bazaar.png",
       path: "/bazaar",
+      stat: "Live mandi pricing",
     },
     {
       title: t.recruitment,
       subtitle: t.recruitmentSubtitle,
       image: "/icons/recruitment.png",
       path: "/recruitment",
+      stat: "Workers nearby",
     },
   ];
 
-  const hasSeenIntro = sessionStorage.getItem("apnabazaar_intro_seen") === "true";
+  const tickerItems = marketPrices.slice(0, 6);
 
+  const suggestions = [
+    "Potato prices are stable today",
+    "2 workers available near your area",
+    "Water Pump available for rent nearby",
+  ];
+
+  const nearbyActivity = [
+    "Ramesh listed a Tractor for Rent",
+    "Sita posted fresh tomatoes",
+    "Lakshmi is available for sorting work",
+  ];
+
+  const homeReadText = `
+    ${t.appTitle}.
+    ${t.equipment}. ${t.equipmentSubtitle}.
+    ${t.personalBazaar}. ${t.bazaarSubtitle}.
+    ${t.recruitment}. ${t.recruitmentSubtitle}.
+  `;
+
+  const hasSeenIntro = sessionStorage.getItem("apnabazaar_intro_seen") === "true";
   const [progress, setProgress] = useState(hasSeenIntro ? 1 : 0);
   const targetProgress = useRef(hasSeenIntro ? 1 : 0);
   const rafRef = useRef(null);
@@ -58,7 +76,6 @@ export default function Home() {
       const maxScroll = 500;
       const raw = clamp(window.scrollY / maxScroll, 0, 1);
       targetProgress.current = raw;
-
       if (raw >= 0.98) {
         sessionStorage.setItem("apnabazaar_intro_seen", "true");
       }
@@ -71,7 +88,6 @@ export default function Home() {
           ? targetProgress.current
           : next;
       });
-
       rafRef.current = requestAnimationFrame(animate);
     };
 
@@ -118,7 +134,11 @@ export default function Home() {
               transform: `translate3d(0, ${shellTranslateY}px, 0)`,
             }}
           >
-           <TopBar title={t.appTitle} />
+            <TopBar title={t.appTitle} />
+
+            <div className="hero-tagline">
+              Connecting villages, markets, and opportunities.
+            </div>
 
             <div className="language-wrap">
               <select
@@ -133,8 +153,36 @@ export default function Home() {
                 ))}
               </select>
             </div>
+
             <div className="voice-row">
-            <VoiceButton textToRead={homeReadText} />
+              <VoiceButton textToRead={homeReadText} />
+            </div>
+
+            <div className="market-strip-wrap">
+                <div className="market-strip-ticker iphone-glass liquid-shell">
+                 <div className="market-strip-track">
+                 {[...tickerItems, ...tickerItems].map((item, index) => (
+                    <div key={`${item.name}-${index}`} className="market-chip liquid-chip">
+                 <strong>{item.name}</strong> ₹{item.modal}/{item.unit}
+             </div>
+             ))}
+            </div>
+            </div>
+            </div>
+
+            <div className="quick-actions-row">
+              <button className="glass-action-btn primary-glass-btn" onClick={() => navigate("/bazaar/sell")}>
+                Sell Product
+              </button>
+              <button className="glass-action-btn secondary-glass-btn" onClick={() => navigate("/equipment/buy")}>
+                Buy Equipment
+              </button>
+              <button className="glass-action-btn secondary-glass-btn" onClick={() => navigate("/recruitment")}>
+                Hire Worker
+              </button>
+              <button className="glass-action-btn secondary-glass-btn" onClick={() => navigate("/recruitment")}>
+                Post Work
+              </button>
             </div>
 
             <div className="cards-row">
@@ -160,10 +208,31 @@ export default function Home() {
                     <div className="card-text-wrap">
                       <h3>{card.title}</h3>
                       <p className="card-subtitle">{card.subtitle}</p>
+                      <span className="card-stat">{card.stat}</span>
                     </div>
                   </article>
                 );
               })}
+            </div>
+
+            <div className="home-lower-grid">
+              <div className="home-info-card liquid-shell iphone-glass">
+                <h3>Smart Suggestions</h3>
+                <ul>
+                  {suggestions.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="home-info-card liquid-shell iphone-glass">
+                <h3>Nearby Activity</h3>
+                <ul>
+                  {nearbyActivity.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
         </div>

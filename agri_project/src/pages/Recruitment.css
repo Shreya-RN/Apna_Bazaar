@@ -1,0 +1,228 @@
+.recruitment-page {
+  min-height: 100vh;
+  padding: 28px 20px;
+  background:
+    radial-gradient(circle at top left, rgba(255,255,255,0.45), transparent 24%),
+    linear-gradient(180deg, #f8f4ec 0%, #eee6da 100%);
+}
+
+.recruitment-shell {
+  width: min(1200px, 100%);
+  min-height: calc(100vh - 56px);
+  margin: 0 auto;
+  padding: 0 0 30px;
+  opacity: 0;
+  transform: translateY(18px) scale(0.992);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+
+.recruitment-shell.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.recruitment-title-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 26px;
+}
+
+.recruitment-title {
+  min-width: 240px;
+  text-align: center;
+  padding: 14px 28px;
+  border-radius: 18px;
+  color: #6b5735;
+  font-size: 1.3rem;
+  font-weight: 700;
+  background: rgba(255,255,255,0.42);
+  border: 1px solid rgba(255,255,255,0.55);
+  box-shadow: 0 10px 26px rgba(80, 70, 50, 0.07);
+  backdrop-filter: blur(16px);
+}
+
+.recruitment-switch-row {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.recruitment-switch-btn {
+  min-width: 220px;
+  padding: 12px 20px;
+  border: 1px solid rgba(255,255,255,0.62);
+  border-radius: 16px;
+  background: rgba(255,255,255,0.45);
+  color: #6b5735;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 10px 22px rgba(80, 70, 50, 0.05);
+  transition: transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+}
+
+.recruitment-switch-btn:hover {
+  transform: translateY(-2px);
+}
+
+.recruitment-switch-btn.active {
+  background: linear-gradient(180deg, #647f35 0%, #4f6926 100%);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 12px 24px rgba(58, 77, 30, 0.18);
+}
+
+.recruitment-board {
+  margin: 28px 26px 0;
+  min-height: 540px;
+  padding: 24px 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.recruitment-tools-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.worker-cards-grid {
+  margin-top: 22px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.worker-card {
+  min-height: 220px;
+  border-radius: 24px;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.worker-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(180deg, #647f35 0%, #4f6926 100%);
+  box-shadow: 0 10px 22px rgba(58, 77, 30, 0.18);
+}
+
+.worker-card-content h3 {
+  margin: 0 0 10px;
+  color: #5d7433;
+  font-size: 1.15rem;
+}
+
+.worker-card-content p {
+  margin: 6px 0;
+  color: #6d655a;
+  font-size: 0.95rem;
+}
+
+.availability-pill {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.availability-pill.available {
+  background: rgba(77, 103, 37, 0.14);
+  color: #4d6725;
+}
+
+.availability-pill.busy {
+  background: rgba(180, 130, 70, 0.16);
+  color: #9b5e16;
+}
+
+.availability-pill.part-time {
+  background: rgba(70, 120, 180, 0.14);
+  color: #2c618f;
+}
+
+.worker-card-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.recruitment-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  position: relative;
+  z-index: 2;
+}
+
+.recruitment-actions {
+  margin-top: 24px;
+  display: flex;
+  gap: 14px;
+  justify-content: flex-end;
+  position: relative;
+  z-index: 2;
+}
+
+.slide-up {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.slide-up.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.delay-1 { transition-delay: 0.06s; }
+.delay-2 { transition-delay: 0.14s; }
+.delay-3 { transition-delay: 0.22s; }
+.delay-4 { transition-delay: 0.3s; }
+.delay-5 { transition-delay: 0.4s; }
+.delay-6 { transition-delay: 0.5s; }
+.delay-7 { transition-delay: 0.6s; }
+.delay-8 { transition-delay: 0.7s; }
+
+@media (max-width: 900px) {
+  .worker-cards-grid,
+  .recruitment-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .recruitment-page {
+    padding: 12px 10px;
+  }
+
+  .recruitment-board {
+    margin: 20px 12px 0;
+  }
+
+  .worker-card {
+    grid-template-columns: 1fr;
+  }
+
+  .worker-card-actions,
+  .recruitment-actions {
+    flex-direction: column;
+  }
+}

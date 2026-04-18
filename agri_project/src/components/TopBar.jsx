@@ -1,9 +1,14 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../context/LanguageContext";
+import { useAuth } from "../context/AuthContext";
+import ProfileDropdown from "./ProfileDropdown";
 
-export default function TopBar({ title, rightExtra = null }) {
+export default function TopBar({ title }) {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { user } = useAuth();
+  const [profileOpen, setProfileOpen] = useState(false);
 
   return (
     <div className="shared-topbar">
@@ -14,13 +19,22 @@ export default function TopBar({ title, rightExtra = null }) {
 
       <div className="shared-title-pill">{title}</div>
 
-      <div style={{ position: "absolute", right: "22px", top: "14px", display: "flex", gap: "10px", alignItems: "center" }}>
-        {rightExtra}
+      <div className="topbar-right-zone">
+        <div className="topbar-user-name">{user?.name || "User"}</div>
 
-        <button className="shared-profile-btn" aria-label="Profile">
+        <button
+          className="shared-profile-btn"
+          aria-label="Profile"
+          onClick={() => setProfileOpen((prev) => !prev)}
+        >
           <span className="shared-profile-head" />
           <span className="shared-profile-body" />
         </button>
+
+        <ProfileDropdown
+          open={profileOpen}
+          onClose={() => setProfileOpen(false)}
+        />
       </div>
     </div>
   );
