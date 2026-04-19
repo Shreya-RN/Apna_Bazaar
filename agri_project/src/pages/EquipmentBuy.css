@@ -97,3 +97,124 @@
     flex-wrap: wrap;
   }
 }
+.equipment-advanced-toolbar {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.equipment-search-wrap {
+  flex: 1;
+  min-width: 260px;
+}
+
+.equipment-search-input {
+  width: 100%;
+  border: 1px solid rgba(255,255,255,0.6);
+  background: rgba(255,255,255,0.42);
+  backdrop-filter: blur(16px);
+  border-radius: 16px;
+  padding: 13px 16px;
+  color: #5e5a4c;
+  outline: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.55),
+    0 10px 24px rgba(80,70,50,0.05);
+}
+
+.equipment-filter-group {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.equipment-select {
+  min-width: 170px;
+  border: 1px solid rgba(255,255,255,0.6);
+  background: rgba(255,255,255,0.42);
+  backdrop-filter: blur(16px);
+  border-radius: 16px;
+  padding: 13px 14px;
+  color: #5e5a4c;
+  outline: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.55),
+    0 10px 24px rgba(80,70,50,0.05);
+}
+
+.equipment-results-meta {
+  color: #7b705f;
+  font-size: 0.95rem;
+  margin-bottom: 14px;
+}
+
+.equipment-card-main {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+}
+
+.equipment-card-main h3 {
+  margin: 0;
+  color: #5d7433;
+}
+
+.equipment-card-main p {
+  margin: 8px 0;
+  color: #7b705f;
+}
+
+.equipment-card-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.equipment-condition-pill {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  background: rgba(93, 116, 51, 0.12);
+  color: #4d6725;
+}
+
+.equipment-empty-state {
+  margin-top: 8px;
+  padding: 22px;
+  border-radius: 18px;
+  text-align: center;
+  color: #6d655a;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .equipment-advanced-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .equipment-filter-group {
+    flex-direction: column;
+  }
+
+  .equipment-select {
+    width: 100%;
+  }
+
+  .equipment-card-main {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .equipment-card-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

@@ -36,9 +36,9 @@ export default function Register() {
     reader.readAsDataURL(file);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const result = register(form);
+    const result = await register(form);
 
     if (!result.ok) {
       setError(result.message);

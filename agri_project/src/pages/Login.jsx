@@ -17,9 +17,9 @@ export default function Login() {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const result = login(form);
+    const result = await login(form);
 
     if (!result.ok) {
       setError(result.message);

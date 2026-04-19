@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 import TopBar from "../components/TopBar";
 import VoiceButton from "../components/VoiceButton";
 import { useLanguage } from "../context/LanguageContext";
-import { marketPrices } from "../data/marketPrices";
+import { getMarketPrices } from "../api/marketApi";
 import "../App.css";
 import heroImg from "../assets/farmer.jpg";
+import RecentlyViewedStrip from "../components/RecentlyViewedStrip";
+import SmartSuggestions from "../components/SmartSuggestions";
 
 function lerp(start, end, factor) {
   return start + (end - start) * factor;
@@ -19,42 +21,43 @@ export default function Home() {
   const navigate = useNavigate();
   const { language, languages, setLanguage, t } = useLanguage();
 
+  const [tickerItems, setTickerItems] = useState([]);
+  const [tickerLoading, setTickerLoading] = useState(true);
+
   const cards = [
     {
       title: t.equipment,
       subtitle: t.equipmentSubtitle,
       image: "/icons/tractor.png",
       path: "/equipment",
-      stat: "120+ listings",
+      stat: "Dynamic listings",
     },
     {
       title: t.personalBazaar,
       subtitle: t.bazaarSubtitle,
       image: "/icons/bazaar.png",
       path: "/bazaar",
-      stat: "Live mandi pricing",
+      stat: "Live market data",
     },
     {
       title: t.recruitment,
       subtitle: t.recruitmentSubtitle,
       image: "/icons/recruitment.png",
       path: "/recruitment",
-      stat: "Workers nearby",
+      stat: "Worker profiles",
     },
   ];
 
-  const tickerItems = marketPrices.slice(0, 6);
-
   const suggestions = [
-    "Potato prices are stable today",
-    "2 workers available near your area",
-    "Water Pump available for rent nearby",
+    "Check live prices before posting products",
+    "Workers can be filtered by skill and wage",
+    "Use Equipment Buy/Sell/Rent for all machinery actions",
   ];
 
   const nearbyActivity = [
-    "Ramesh listed a Tractor for Rent",
-    "Sita posted fresh tomatoes",
-    "Lakshmi is available for sorting work",
+    "Latest data now comes from backend APIs",
+    "Market strip updates from server prices",
+    "Profiles are loaded from registered backend users",
   ];
 
   const homeReadText = `
@@ -63,6 +66,21 @@ export default function Home() {
     ${t.personalBazaar}. ${t.bazaarSubtitle}.
     ${t.recruitment}. ${t.recruitmentSubtitle}.
   `;
+
+  useEffect(() => {
+    async function loadMarketPrices() {
+      try {
+        const result = await getMarketPrices();
+        setTickerItems(result.data || []);
+      } catch {
+        setTickerItems([]);
+      } finally {
+        setTickerLoading(false);
+      }
+    }
+
+    loadMarketPrices();
+  }, []);
 
   const hasSeenIntro = sessionStorage.getItem("apnabazaar_intro_seen") === "true";
   const [progress, setProgress] = useState(hasSeenIntro ? 1 : 0);
@@ -108,6 +126,8 @@ export default function Home() {
 
   const shellOpacity = hasSeenIntro ? 1 : clamp((progress - 0.2) / 0.5, 0, 1);
   const shellTranslateY = hasSeenIntro ? 0 : lerp(60, 0, shellOpacity);
+
+  const finalTicker = tickerItems.length ? tickerItems.slice(0, 6) : [];
 
   return (
     <div className="page">
@@ -159,15 +179,20 @@ export default function Home() {
             </div>
 
             <div className="market-strip-wrap">
-                <div className="market-strip-ticker iphone-glass liquid-shell">
-                 <div className="market-strip-track">
-                 {[...tickerItems, ...tickerItems].map((item, index) => (
-                    <div key={`${item.name}-${index}`} className="market-chip liquid-chip">
-                 <strong>{item.name}</strong> ₹{item.modal}/{item.unit}
-             </div>
-             ))}
-            </div>
-            </div>
+              <div className="market-strip-ticker iphone-glass liquid-shell">
+                <div className="market-strip-track">
+                  {!tickerLoading &&
+                    [...finalTicker, ...finalTicker].map((item, index) => (
+                      <div
+                        key={`${item.productName || item.name}-${index}`}
+                        className="market-chip liquid-chip"
+                      >
+                        <strong>{item.productName || item.name}</strong>{" "}
+                        ₹{item.modalPrice || item.modal}/{item.unit}
+                      </div>
+                    ))}
+                </div>
+              </div>
             </div>
 
             <div className="quick-actions-row">
@@ -215,22 +240,23 @@ export default function Home() {
               })}
             </div>
 
+                       <RecentlyViewedStrip />
+
             <div className="home-lower-grid">
-              <div className="home-info-card liquid-shell iphone-glass">
-                <h3>Smart Suggestions</h3>
-                <ul>
-                  {suggestions.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </div>
+              <SmartSuggestions
+                items={[
+                  "Potato demand is rising in nearby markets",
+                  "2 verified workers available near your village",
+                  "Rental equipment with good ratings is trending today",
+                ]}
+              />
 
               <div className="home-info-card liquid-shell iphone-glass">
                 <h3>Nearby Activity</h3>
                 <ul>
-                  {nearbyActivity.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
+                  <li>Ramesh listed a tractor for rent</li>
+                  <li>Sita posted fresh tomatoes at fair price</li>
+                  <li>Lakshmi is available for sorting work</li>
                 </ul>
               </div>
             </div>

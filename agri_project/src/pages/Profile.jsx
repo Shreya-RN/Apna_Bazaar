@@ -40,9 +40,9 @@ export default function Profile() {
     reader.readAsDataURL(file);
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    const result = updateProfile(form);
+    const result = await updateProfile(form);
 
     if (!result.ok) {
       setMessage(result.message);

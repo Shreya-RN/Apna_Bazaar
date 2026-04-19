@@ -1,9 +1,24 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+
 import TopBar from "../components/TopBar";
 import VoiceButton from "../components/VoiceButton";
+import DetailsModal from "../components/DetailsModal";
+import LoadingSkeleton from "../components/LoadingSkeleton";
+import EmptyState from "../components/EmptyState";
+import VerifiedBadge from "../components/VerifiedBadge";
+import RatingStars from "../components/RatingStars";
+import DemandBadge from "../components/DemandBadge";
+import VoiceSearchButton from "../components/VoiceSearchButton";
+import MapViewCard from "../components/MapViewCard";
+import InlineActions from "../components/InlineActions";
+
 import { useLanguage } from "../context/LanguageContext";
-import { marketPrices } from "../data/marketPrices";
+import { useToast } from "../context/ToastContext";
+import { useRecentlyViewed } from "../context/RecentlyViewedContext";
+
+import { getBazaarProducts } from "../api/bazaarApi";
+
 import "./Bazaar.css";
 
 function getPriceStatus(price, modal) {
@@ -17,96 +32,209 @@ function getPriceStatus(price, modal) {
 
 export default function Bazaar() {
   const [show, setShow] = useState(false);
-  const [activeSection, setActiveSection] = useState("browse");
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState("latest");
+  const [categoryFilter, setCategoryFilter] = useState("All");
+  const [statusFilter, setStatusFilter] = useState("All");
+
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const location = useLocation();
   const navigate = useNavigate();
+
   const { t } = useLanguage();
+  const { showToast } = useToast();
+  const { addRecentlyViewed } = useRecentlyViewed();
 
-  const sampleProducts = marketPrices.slice(0, 4).map((item) => ({
-    ...item,
-    sellerPrice: item.modal,
-    status: getPriceStatus(item.modal, item.modal),
-    location: "Local Market",
-    seller: "Village Farmer",
-  }));
-
-  const bazaarReadText = `
-    ${t.personalBazaar}.
-    Two sections available.
-    Sell your product.
-    Browse market products.
-    Market price guidance is available for vegetables and grains.
-  `;
+  const [activeSection, setActiveSection] = useState(
+    location.pathname === "/bazaar/sell" ? "sell" : "browse"
+  );
 
   useEffect(() => {
-    const timer = setTimeout(() => setShow(true), 100);
-    return () => clearTimeout(timer);
+    setActiveSection(location.pathname === "/bazaar/sell" ? "sell" : "browse");
+  }, [location.pathname]);
+
+  useEffect(() => {
+    setTimeout(() => setShow(true), 100);
   }, []);
+
+  useEffect(() => {
+    async function loadProducts() {
+      try {
+        const result = await getBazaarProducts();
+        setProducts(result.data || []);
+      } catch {
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadProducts();
+  }, []);
+
+  const categories = useMemo(() => {
+    const values = products.map((p) => p.category).filter(Boolean);
+    return ["All", ...new Set(values)];
+  }, [products]);
+
+  const filteredProducts = useMemo(() => {
+    let result = [...products];
+
+    result = result.map((item) => {
+      const seller = Number(item.sellerPrice || item.seller_price || 0);
+      const modal = Number(item.marketModal || item.market_modal || 0);
+      return { ...item, computedStatus: getPriceStatus(seller, modal) };
+    });
+
+    if (searchTerm) {
+      const q = searchTerm.toLowerCase();
+      result = result.filter((item) =>
+        `${item.productName} ${item.category} ${item.location}`
+          .toLowerCase()
+          .includes(q)
+      );
+    }
+
+    if (categoryFilter !== "All") {
+      result = result.filter((item) => item.category === categoryFilter);
+    }
+
+    if (statusFilter !== "All") {
+      result = result.filter(
+        (item) => item.computedStatus === statusFilter
+      );
+    }
+
+    if (sortBy === "priceLowHigh") {
+      result.sort((a, b) => a.sellerPrice - b.sellerPrice);
+    } else if (sortBy === "priceHighLow") {
+      result.sort((a, b) => b.sellerPrice - a.sellerPrice);
+    }
+
+    return result;
+  }, [products, searchTerm, sortBy, categoryFilter, statusFilter]);
 
   return (
     <div className="bazaar-page">
       <div className={`bazaar-shell liquid-shell iphone-glass ${show ? "show" : ""}`}>
         <TopBar title={t.personalBazaar} />
 
-        <div className={`bazaar-title-wrap slide-up delay-1 ${show ? "show" : ""}`}>
-          <div className="bazaar-title">{t.personalBazaar}</div>
+        <div className="bazaar-title">{t.personalBazaar}</div>
+
+        {/* SEARCH + VOICE */}
+        <div className="advanced-search-row">
+          <input
+            className="bazaar-search-input"
+            placeholder="Search product..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <VoiceSearchButton onResult={setSearchTerm} />
         </div>
 
-        <div className={`voice-row slide-up delay-2 ${show ? "show" : ""}`}>
-          <VoiceButton textToRead={bazaarReadText} />
+        {/* FILTERS */}
+        <div className="bazaar-filter-group">
+          <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+            <option value="latest">Latest</option>
+            <option value="priceLowHigh">Low → High</option>
+            <option value="priceHighLow">High → Low</option>
+          </select>
+
+          <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
+            {categories.map((c) => <option key={c}>{c}</option>)}
+          </select>
+
+          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+            <option>All</option>
+            <option>Below Market</option>
+            <option>Fair Price</option>
+            <option>Premium Price</option>
+          </select>
         </div>
 
-        <div className={`bazaar-switch-row slide-up delay-3 ${show ? "show" : ""}`}>
-          <button
-            className={activeSection === "sell" ? "bazaar-switch-btn active" : "bazaar-switch-btn"}
-            onClick={() => {
-              setActiveSection("sell");
-              navigate("/bazaar/sell");
-            }}
-          >
-            Sell Your Product
-          </button>
-
-          <button
-            className={activeSection === "browse" ? "bazaar-switch-btn active" : "bazaar-switch-btn"}
-            onClick={() => setActiveSection("browse")}
-          >
-            Browse Market Products
-          </button>
-        </div>
-
-        <div className={`bazaar-board liquid-board iphone-glass slide-up delay-4 ${show ? "show" : ""}`}>
-          <div className="bazaar-tools-row">
-            <button className="small-action-btn">Sort</button>
-            <button className="small-action-btn">Filter</button>
-          </div>
-
-          <div className="bazaar-products-list">
-            {sampleProducts.map((item, index) => (
-              <div
-                key={item.name}
-                className={`bazaar-product-card liquid-list-card iphone-glass slide-up delay-${index + 5} ${show ? "show" : ""}`}
+        {/* MAIN CONTENT */}
+        {loading ? (
+          <LoadingSkeleton rows={4} />
+        ) : filteredProducts.length === 0 ? (
+          <EmptyState
+            title="No products found"
+            subtitle="Try changing filters"
+            action={
+              <button
+                onClick={() => {
+                  setSearchTerm("");
+                  setCategoryFilter("All");
+                  setStatusFilter("All");
+                }}
               >
-                <div className="bazaar-product-left">
-                  <h3>{item.name}</h3>
-                  <p>{item.category}</p>
-                  <p>{item.location}</p>
-                </div>
+                Reset
+              </button>
+            }
+          />
+        ) : (
+          <div className="bazaar-products-list">
+            {filteredProducts.map((item, index) => {
+              const status = item.computedStatus;
 
-                <div className="bazaar-product-middle">
-                  <span>Market: ₹{item.modal}/{item.unit}</span>
-                  <span>Your Price: ₹{item.sellerPrice}/{item.unit}</span>
-                </div>
+              return (
+                <div key={index} className="bazaar-product-card">
+                  <div>
+                    <h3>{item.productName}</h3>
+                    <p>{item.location}</p>
+                  </div>
 
-                <div className="bazaar-product-right">
-                  <span className={`price-status-pill ${item.status.toLowerCase().replace(/\s/g, "-")}`}>
-                    {item.status}
-                  </span>
-                  <button className="glass-action-btn primary-glass-btn">View</button>
+                  <div>
+                    ₹{item.sellerPrice}/{item.unit}
+                  </div>
+
+                  <div>
+                    <VerifiedBadge verified />
+                    <RatingStars rating={4.6} />
+                    <DemandBadge demand="High" />
+                    <span>{status}</span>
+
+                    <InlineActions
+                      onView={() => {
+                        setSelectedProduct(item);
+                        setModalOpen(true);
+
+                        addRecentlyViewed({
+                          id: item.id,
+                          title: item.productName,
+                          path: "/bazaar",
+                        });
+
+                        showToast("Opened product", "success");
+                      }}
+                    />
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
-        </div>
+        )}
+
+        {/* MODAL */}
+        <DetailsModal
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+          title={selectedProduct?.productName}
+          fields={[
+            { label: "Category", value: selectedProduct?.category },
+            { label: "Price", value: selectedProduct?.sellerPrice },
+            { label: "Location", value: selectedProduct?.location },
+          ]}
+          extraContent={
+            <MapViewCard
+              lat={selectedProduct?.latitude}
+              lng={selectedProduct?.longitude}
+            />
+          }
+        />
       </div>
     </div>
   );

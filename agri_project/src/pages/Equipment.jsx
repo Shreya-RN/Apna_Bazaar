@@ -3,26 +3,45 @@ import { useNavigate } from "react-router-dom";
 import TopBar from "../components/TopBar";
 import VoiceButton from "../components/VoiceButton";
 import { useLanguage } from "../context/LanguageContext";
+import { getEquipmentListings } from "../api/equipmentApi";
 import "./Equipment.css";
 
 export default function Equipment() {
   const [show, setShow] = useState(false);
   const [activeTab, setActiveTab] = useState("buy");
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const navigate = useNavigate();
   const { t } = useLanguage();
 
   const equipmentReadText = `
     ${t.equipment}.
     ${t.buy}. ${t.sell}. ${t.rent}.
-    ${t.recommendation}.
-    ${t.rec1}.
-    ${t.rec2}.
+    Available equipment listings are loaded dynamically.
   `;
 
   useEffect(() => {
     const timer = setTimeout(() => setShow(true), 100);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    async function loadItems() {
+      try {
+        const result = await getEquipmentListings();
+        setItems(result.data || []);
+      } catch {
+        setItems([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadItems();
+  }, []);
+
+  const recommendations = items.slice(0, 2);
 
   return (
     <div className="equipment-page">
@@ -70,15 +89,20 @@ export default function Equipment() {
         </div>
 
         <div className={`equipment-board liquid-board iphone-glass slide-up delay-4 ${show ? "show" : ""}`}>
-          <div className="recommendation-tag">{t.recommendation}</div>
+          <div className="recommendation-tag">
+            {loading ? "Loading..." : t.recommendation}
+          </div>
 
           <div className="recommendation-list">
-            <div className={`recommendation-card liquid-list-card iphone-glass slide-up delay-5 ${show ? "show" : ""}`}>
-              {t.rec1}
-            </div>
-            <div className={`recommendation-card liquid-list-card iphone-glass slide-up delay-6 ${show ? "show" : ""}`}>
-              {t.rec2}
-            </div>
+            {!loading &&
+              recommendations.map((item, index) => (
+                <div
+                  key={item.id || index}
+                  className={`recommendation-card liquid-list-card iphone-glass slide-up delay-${index + 5} ${show ? "show" : ""}`}
+                >
+                  {item.nameModel || item.name_model || item.name || "Equipment"}
+                </div>
+              ))}
           </div>
         </div>
       </div>

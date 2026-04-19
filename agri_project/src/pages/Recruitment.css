@@ -226,3 +226,96 @@
     flex-direction: column;
   }
 }
+.recruitment-advanced-toolbar {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.recruitment-search-wrap {
+  flex: 1;
+  min-width: 260px;
+}
+
+.recruitment-search-input {
+  width: 100%;
+  border: 1px solid rgba(255,255,255,0.6);
+  background: rgba(255,255,255,0.42);
+  backdrop-filter: blur(16px);
+  border-radius: 16px;
+  padding: 13px 16px;
+  color: #5e5a4c;
+  outline: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.55),
+    0 10px 24px rgba(80,70,50,0.05);
+}
+
+.recruitment-filter-group {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.recruitment-select {
+  min-width: 180px;
+  border: 1px solid rgba(255,255,255,0.6);
+  background: rgba(255,255,255,0.42);
+  backdrop-filter: blur(16px);
+  border-radius: 16px;
+  padding: 13px 14px;
+  color: #5e5a4c;
+  outline: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.55),
+    0 10px 24px rgba(80,70,50,0.05);
+}
+
+.recruitment-results-meta {
+  color: #7b705f;
+  font-size: 0.95rem;
+  margin-bottom: 14px;
+}
+
+.recruitment-empty-state {
+  margin-top: 8px;
+  padding: 22px;
+  border-radius: 18px;
+  text-align: center;
+  color: #6d655a;
+  font-weight: 600;
+  grid-column: 1 / -1;
+}
+
+.availability-pill.available {
+  background: rgba(77, 103, 37, 0.14);
+  color: #4d6725;
+}
+
+.availability-pill.busy {
+  background: rgba(180, 130, 70, 0.16);
+  color: #9b5e16;
+}
+
+.availability-pill.part-time {
+  background: rgba(70, 120, 180, 0.14);
+  color: #2c618f;
+}
+
+@media (max-width: 768px) {
+  .recruitment-advanced-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .recruitment-filter-group {
+    flex-direction: column;
+  }
+
+  .recruitment-select {
+    width: 100%;
+  }
+}

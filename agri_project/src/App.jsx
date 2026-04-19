@@ -1,5 +1,8 @@
-import { Navigate, Routes, Route } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
 import { useAuth } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+import PageTransition from "./components/PageTransition";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -13,54 +16,34 @@ import Bazaar from "./pages/Bazaar";
 import BazaarSell from "./pages/BazaarSell";
 import Recruitment from "./pages/Recruitment";
 
-function PrivateRoute({ children }) {
-  const { isAuthenticated } = useAuth();
-  return isAuthenticated ? children : <Navigate to="/login" replace />;
-}
-
 function PublicRoute({ children }) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, bootLoading } = useAuth();
+
+  if (bootLoading) {
+    return <div style={{ padding: "40px", textAlign: "center" }}>Loading...</div>;
+  }
+
   return isAuthenticated ? <Navigate to="/" replace /> : children;
 }
 
 export default function App() {
+  const location = useLocation();
+
   return (
-    <Routes>
-      <Route
-        path="/login"
-        element={
-          <PublicRoute>
-            <Login />
-          </PublicRoute>
-        }
-      />
-
-      <Route
-        path="/register"
-        element={
-          <PublicRoute>
-            <Register />
-          </PublicRoute>
-        }
-      />
-
-      <Route
-        path="/profile"
-        element={
-          <PrivateRoute>
-            <Profile />
-          </PrivateRoute>
-        }
-      />
-
-      <Route path="/" element={<PrivateRoute><Home /></PrivateRoute>} />
-      <Route path="/equipment" element={<PrivateRoute><Equipment /></PrivateRoute>} />
-      <Route path="/equipment/buy" element={<PrivateRoute><EquipmentBuy /></PrivateRoute>} />
-      <Route path="/equipment/sell" element={<PrivateRoute><EquipmentSell /></PrivateRoute>} />
-      <Route path="/equipment/rent" element={<PrivateRoute><EquipmentRent /></PrivateRoute>} />
-      <Route path="/bazaar" element={<PrivateRoute><Bazaar /></PrivateRoute>} />
-      <Route path="/bazaar/sell" element={<PrivateRoute><BazaarSell /></PrivateRoute>} />
-      <Route path="/recruitment" element={<PrivateRoute><Recruitment /></PrivateRoute>} />
-    </Routes>
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/login" element={<PublicRoute><PageTransition><Login /></PageTransition></PublicRoute>} />
+        <Route path="/register" element={<PublicRoute><PageTransition><Register /></PageTransition></PublicRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><PageTransition><Profile /></PageTransition></ProtectedRoute>} />
+        <Route path="/" element={<ProtectedRoute><PageTransition><Home /></PageTransition></ProtectedRoute>} />
+        <Route path="/equipment" element={<ProtectedRoute><PageTransition><Equipment /></PageTransition></ProtectedRoute>} />
+        <Route path="/equipment/buy" element={<ProtectedRoute><PageTransition><EquipmentBuy /></PageTransition></ProtectedRoute>} />
+        <Route path="/equipment/sell" element={<ProtectedRoute><PageTransition><EquipmentSell /></PageTransition></ProtectedRoute>} />
+        <Route path="/equipment/rent" element={<ProtectedRoute><PageTransition><EquipmentRent /></PageTransition></ProtectedRoute>} />
+        <Route path="/bazaar" element={<ProtectedRoute><PageTransition><Bazaar /></PageTransition></ProtectedRoute>} />
+        <Route path="/bazaar/sell" element={<ProtectedRoute><PageTransition><BazaarSell /></PageTransition></ProtectedRoute>} />
+        <Route path="/recruitment" element={<ProtectedRoute><PageTransition><Recruitment /></PageTransition></ProtectedRoute>} />
+      </Routes>
+    </AnimatePresence>
   );
 }

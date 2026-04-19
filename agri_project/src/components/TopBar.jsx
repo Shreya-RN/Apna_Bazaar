@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../context/LanguageContext";
 import { useAuth } from "../context/AuthContext";
 import ProfileDropdown from "./ProfileDropdown";
+import ThemeToggle from "./ThemeToggle";
 
 export default function TopBar({ title }) {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ export default function TopBar({ title }) {
 
       <div className="topbar-right-zone">
         <div className="topbar-user-name">{user?.name || "User"}</div>
-
+        <ThemeToggle />
         <button
           className="shared-profile-btn"
           aria-label="Profile"
@@ -31,10 +32,7 @@ export default function TopBar({ title }) {
           <span className="shared-profile-body" />
         </button>
 
-        <ProfileDropdown
-          open={profileOpen}
-          onClose={() => setProfileOpen(false)}
-        />
+        <ProfileDropdown open={profileOpen} onClose={() => setProfileOpen(false)} />
       </div>
     </div>
   );
