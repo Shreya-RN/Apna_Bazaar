@@ -47,10 +47,6 @@ Temporary files
 *.tmp
 *.swp
 
-Node (if frontend exists)
-
-node_modules/
-
 Build folders
 
 dist/
