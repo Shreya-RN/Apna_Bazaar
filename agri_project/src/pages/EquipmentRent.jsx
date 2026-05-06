@@ -67,7 +67,7 @@ export default function EquipmentRent() {
     async function loadRentItems() {
       try {
         const result = await getEquipmentListings("rent");
-        setRentItems(result.data || []);
+        setRentItems(result || []);
       } catch {
         setRentItems([]);
       } finally {
