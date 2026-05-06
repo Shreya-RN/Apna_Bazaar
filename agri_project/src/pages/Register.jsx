@@ -37,16 +37,18 @@ export default function Register() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
+
+  try {
     const result = await register(form);
+    console.log(result); // 👈 see response
 
-    if (!result.ok) {
-      setError(result.message);
-      return;
-    }
-
-    navigate("/");
-  };
+    navigate("/"); // success
+  } catch (err) {
+    console.error(err);
+    setError("Registration failed");
+  }
+};
 
   return (
     <div className="auth-page">
