@@ -43,53 +43,75 @@ export default function BazaarSell() {
   }, []);
 
   useEffect(() => {
-    async function loadPrices() {
-      try {
-        const result = await getMarketPrices();
-        const list = result.data || [];
-        setMarketPriceList(list);
+ async function loadPrices() {
+   try {
 
-        if (list.length) {
-          const first = list[0];
-          setForm((prev) => ({
-            ...prev,
-            productName: first.productName || first.name,
-            category: first.category,
-            unit: first.unit,
-            marketMin: first.minPrice || first.min,
-            marketModal: first.modalPrice || first.modal,
-            marketMax: first.maxPrice || first.max,
-          }));
-        }
-      } catch {
-        setMarketPriceList([]);
-      }
-    }
+     const result = await getMarketPrices();
 
-    loadPrices();
-  }, []);
+     console.log(result);
 
-  const selectedProduct = useMemo(
-    () =>
-      marketPriceList.find(
-        (item) =>
-          (item.productName || item.name) === form.productName
-      ),
-    [marketPriceList, form.productName]
-  );
+     const list = Array.isArray(result)
+       ? result
+       : result.data || [];
 
-  useEffect(() => {
-    if (!selectedProduct) return;
+     setMarketPriceList(list);
 
-    setForm((prev) => ({
-      ...prev,
-      category: selectedProduct.category,
-      unit: selectedProduct.unit,
-      marketMin: selectedProduct.minPrice || selectedProduct.min,
-      marketModal: selectedProduct.modalPrice || selectedProduct.modal,
-      marketMax: selectedProduct.maxPrice || selectedProduct.max,
-    }));
-  }, [selectedProduct]);
+     if(list.length){
+       const first = list[0];
+
+       setForm(prev => ({
+         ...prev,
+         category:first.category,
+         unit:first.unit,
+         marketMin:first.minPrice,
+         marketModal:first.modalPrice,
+         marketMax:first.maxPrice
+       }));
+     }
+
+   } catch(err){
+     console.error(err);
+     setMarketPriceList([]);
+   }
+ }
+
+ loadPrices();
+}, []);
+
+ 
+
+  
+
+useEffect(() => {
+
+if(!form.category || marketPriceList.length===0) return;
+
+const selected = marketPriceList.find(
+ item => item.category === form.category
+);
+
+if(!selected) return;
+
+setForm(prev => {
+ if(
+   prev.unit===selected.unit &&
+   prev.marketMin===selected.minPrice &&
+   prev.marketModal===selected.modalPrice &&
+   prev.marketMax===selected.maxPrice
+ ){
+   return prev; // prevents infinite re-render
+ }
+
+ return {
+   ...prev,
+   unit:selected.unit,
+   marketMin:selected.minPrice,
+   marketModal:selected.modalPrice,
+   marketMax:selected.maxPrice
+ };
+});
+
+}, [form.category, marketPriceList]);
 
   const priceStatus = getPriceStatus(form.sellerPrice, form.marketModal);
 
@@ -152,24 +174,37 @@ export default function BazaarSell() {
             </div>
 
             <div className="glass-input-group">
-              <label>Product</label>
-              <select
-                name="productName"
-                value={form.productName}
-                onChange={handleChange}
-              >
-                {marketPriceList.map((item) => (
-                  <option key={item.id || item.productName || item.name} value={item.productName || item.name}>
-                    {item.productName || item.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+  <label>Product</label>
+  <input
+    type="text"
+    name="productName"
+    value={form.productName}
+    onChange={handleChange}
+    
+  />
+</div>
 
             <div className="glass-input-group">
-              <label>Category</label>
-              <input name="category" value={form.category} readOnly />
-            </div>
+<label>Category</label>
+
+<select
+ name="category"
+ value={form.category}
+ onChange={handleChange}
+>
+<option value="">Select Category</option>
+
+{marketPriceList.map(item => (
+  <option
+    key={item.id}
+    value={item.category}
+  >
+    {item.category}
+  </option>
+))}
+
+</select>
+</div>
 
             <div className="glass-input-group">
               <label>Unit</label>
