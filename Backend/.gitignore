@@ -1,0 +1,66 @@
+Maven
+
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+Logs
+
+logs/
+*.log
+
+Compiled class files
+
+*.class
+
+Package files
+
+*.jar
+*.war
+*.ear
+
+IDE files
+
+.idea/
+*.iml
+.vscode/
+*.classpath
+*.project
+.settings/
+
+OS files
+
+.DS_Store
+Thumbs.db
+
+Environment variables
+
+.env
+.env.*
+
+Application secrets
+
+application.properties
+application.yml
+
+Temporary files
+
+*.tmp
+*.swp
+
+Node (if frontend exists)
+
+node_modules/
+
+Build folders
+
+dist/
+build/
+
+Coverage reports
+
+coverage/
+
+Mac system files
+
+.AppleDouble
+.LSOverride
