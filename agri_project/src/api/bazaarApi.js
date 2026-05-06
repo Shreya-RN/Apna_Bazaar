@@ -1,16 +1,17 @@
 import { apiRequest } from "./apiClient";
 
-export function getBazaarProducts() {
-  return apiRequest("/bazaar/products");
+export function getEquipmentListings(type = "") {
+  const suffix = type ? `?type=${encodeURIComponent(type)}` : "";
+  return apiRequest(`/equipment${suffix}`);
 }
 
-export function addBazaarProduct(payload) {
-  return apiRequest("/bazaar/products", {
+export function addEquipmentListing(payload) {
+  return apiRequest("/equipment", {
     method: "POST",
     body: JSON.stringify(payload),
   });
 }
 
-export function getBazaarProductById(id) {
-  return apiRequest(`/bazaar/products/${id}`);
+export function getEquipmentById(id) {
+  return apiRequest(`/equipment/${id}`);
 }
