@@ -76,7 +76,7 @@ export default function Recruitment() {
     async function loadWorkers() {
       try {
         const result = await getWorkers();
-        setWorkers(result.data || []);
+        setWorkers(result || []);
       } catch {
         setWorkers([]);
       }
