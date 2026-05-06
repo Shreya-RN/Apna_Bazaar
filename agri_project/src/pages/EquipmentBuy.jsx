@@ -47,8 +47,8 @@ export default function EquipmentBuy() {
   useEffect(() => {
     async function loadBuyItems() {
       try {
-        const result = await getEquipmentListings("buy");
-        setBuyOptions(result.data || []);
+        const result = await getEquipmentListings("sell");
+        setBuyOptions(result || []);
       } catch {
         setBuyOptions([]);
       } finally {
