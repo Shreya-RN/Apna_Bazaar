@@ -30,7 +30,7 @@ export default function Equipment() {
     async function loadItems() {
       try {
         const result = await getEquipmentListings();
-        setItems(result.data || []);
+       setItems(result || []);
       } catch {
         setItems([]);
       } finally {
