@@ -66,7 +66,7 @@ export default function Bazaar() {
     async function loadProducts() {
       try {
         const result = await getBazaarProducts();
-        setProducts(result.data || []);
+        setProducts(result || []);
       } catch {
         setProducts([]);
       } finally {
