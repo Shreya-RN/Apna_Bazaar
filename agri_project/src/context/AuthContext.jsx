@@ -32,17 +32,20 @@ export default function AuthProvider({ children }) {
 
   // 🔐 LOGIN
   const login = async (formData) => {
-    try {
-      const res = await loginUser(formData);
-      setUser(res.user);
-      return { success: true };
-    } catch (err) {
-      return {
-        success: false,
-        message: err.message || "Login failed",
-      };
-    }
-  };
+  try {
+    const res = await loginUser(formData);
+
+    localStorage.setItem("token", res.token); // ✅ ADD THIS
+    setUser(res.user);
+
+    return { success: true };
+  } catch (err) {
+    return {
+      success: false,
+      message: err.message || "Login failed",
+    };
+  }
+};
 
   // 📝 REGISTER
   const register = async (formData) => {
