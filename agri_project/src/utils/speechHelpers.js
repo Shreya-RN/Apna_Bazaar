@@ -16,75 +16,42 @@ function getLangCode(language) {
 
 function loadVoices() {
   return new Promise((resolve) => {
-    const existing = window.speechSynthesis.getVoices();
-    if (existing.length) {
-      resolve(existing);
+    let voices = speechSynthesis.getVoices();
+
+    if (voices.length) {
+      resolve(voices);
       return;
     }
 
-    const handleVoicesChanged = () => {
-      const voices = window.speechSynthesis.getVoices();
-      if (voices.length) {
-        window.speechSynthesis.removeEventListener("voiceschanged", handleVoicesChanged);
-        resolve(voices);
-      }
+    speechSynthesis.onvoiceschanged = () => {
+      voices = speechSynthesis.getVoices();
+      resolve(voices);
     };
-
-    window.speechSynthesis.addEventListener("voiceschanged", handleVoicesChanged);
-
-    setTimeout(() => {
-      const fallbackVoices = window.speechSynthesis.getVoices();
-      resolve(fallbackVoices);
-    }, 1200);
   });
 }
 
-function pickBestVoice(voices, langCode, languageName) {
+function pickBestVoice(voices, langCode) {
   if (!voices?.length) return null;
-
-  if (languageName === "Bhojpuri") {
-    return (
-      voices.find((voice) => voice.lang?.toLowerCase() === "hi-in") ||
-      voices.find((voice) => voice.lang?.toLowerCase().startsWith("hi")) ||
-      voices.find((voice) => voice.lang?.toLowerCase() === "en-in") ||
-      voices[0] ||
-      null
-    );
-  }
-
-  if (languageName === "Assamese") {
-    return (
-      voices.find((voice) => voice.lang?.toLowerCase() === "as-in") ||
-      voices.find((voice) => voice.lang?.toLowerCase().startsWith("as")) ||
-      voices.find((voice) => voice.lang?.toLowerCase() === "hi-in") ||
-      voices.find((voice) => voice.lang?.toLowerCase().startsWith("hi")) ||
-      voices.find((voice) => voice.lang?.toLowerCase() === "en-in") ||
-      voices[0] ||
-      null
-    );
-  }
-
-  const exact = voices.find((voice) => voice.lang?.toLowerCase() === langCode.toLowerCase());
-  if (exact) return exact;
 
   const base = langCode.split("-")[0].toLowerCase();
 
-  const sameBase = voices.find((voice) =>
-    voice.lang?.toLowerCase().startsWith(base)
+  // Prefer offline voices first (avoid Online Natural voices)
+  return (
+    voices.find(
+      v =>
+        v.lang?.toLowerCase().startsWith(base) &&
+        !v.name.includes("Online")
+    ) ||
+    voices.find(
+      v =>
+        v.lang?.toLowerCase().startsWith(base)
+    ) ||
+    voices.find(
+      v =>
+        v.lang?.toLowerCase().startsWith("en")
+    ) ||
+    voices[0]
   );
-  if (sameBase) return sameBase;
-
-  const indianEnglish = voices.find((voice) =>
-    voice.lang?.toLowerCase() === "en-in"
-  );
-  if (indianEnglish) return indianEnglish;
-
-  const anyEnglish = voices.find((voice) =>
-    voice.lang?.toLowerCase().startsWith("en")
-  );
-  if (anyEnglish) return anyEnglish;
-
-  return voices[0] || null;
 }
 
 export function stopSpeech() {
@@ -95,7 +62,7 @@ export function stopSpeech() {
 
 export async function speakText(text, language = "English") {
   if (!("speechSynthesis" in window)) {
-    alert("Text-to-speech is not supported in this browser.");
+    alert("Text-to-speech not supported");
     return false;
   }
 
@@ -106,15 +73,24 @@ export async function speakText(text, language = "English") {
 
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = langCode;
-  utterance.rate = 0.92;
-  utterance.pitch = 1;
-  utterance.volume = 1;
 
-  const bestVoice = pickBestVoice(voices, langCode, language);
+  const bestVoice = pickBestVoice(voices, langCode);
+
+  if (bestVoice) {
+    utterance.voice = bestVoice;
+    console.log("Using voice:", bestVoice.name);
+  }
 
   return new Promise((resolve) => {
     utterance.onend = () => resolve(true);
-    utterance.onerror = () => resolve(false);
-    window.speechSynthesis.speak(utterance);
+
+    utterance.onerror = (e) => {
+      console.error(e);
+      resolve(false);
+    };
+
+    setTimeout(() => {
+      speechSynthesis.speak(utterance);
+    }, 500);
   });
 }
