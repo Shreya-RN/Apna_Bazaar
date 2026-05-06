@@ -10,11 +10,12 @@ export default function VoiceSearchButton({ onResult }) {
       window.SpeechRecognition || window.webkitSpeechRecognition;
 
     if (!Recognition) {
-      showToast("Voice search not supported in this browser", "error");
+      showToast("Voice search not supported", "error");
       return;
     }
 
     const recognition = new Recognition();
+
     recognition.lang = "en-IN";
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
@@ -23,9 +24,17 @@ export default function VoiceSearchButton({ onResult }) {
     recognition.start();
 
     recognition.onresult = (event) => {
-      const text = event.results?.[0]?.[0]?.transcript || "";
-      onResult(text);
-      showToast(`Voice search: ${text}`, "success");
+      const rawText =
+        event.results?.[0]?.[0]?.transcript || "";
+
+      const cleanedText = rawText
+        .replace(/[^\w\s]/g, "")
+        .trim()
+        .toLowerCase();
+
+      onResult(cleanedText);
+
+      showToast(`Voice search: ${cleanedText}`, "success");
     };
 
     recognition.onerror = () => {
@@ -38,7 +47,10 @@ export default function VoiceSearchButton({ onResult }) {
   };
 
   return (
-    <button className="voice-search-btn" onClick={handleStart}>
+    <button
+      className="voice-search-btn"
+      onClick={handleStart}
+    >
       {listening ? "Listening..." : "Voice Search"}
     </button>
   );
