@@ -18,16 +18,22 @@ export default function Login() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
+
+  try {
     const result = await login(form);
 
-    if (!result.ok) {
-      setError(result.message);
-      return;
-    }
+if (!result.success) {
+  setError(result.message);
+  return;
+}
 
-    navigate("/");
-  };
+navigate("/");
+  } catch (err) {
+    console.error(err);
+    setError("Login failed");
+  }
+};
 
   return (
     <div className="auth-page">
